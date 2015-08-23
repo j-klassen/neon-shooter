@@ -12,3 +12,5 @@ Build
 -----
 
 `> haxe compile.hxml`
+
+This will update the `bin/NeonShooter.js` file
