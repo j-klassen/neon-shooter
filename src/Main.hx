@@ -1,7 +1,7 @@
 import js.Lib;
 
 class Main {
-  static function main() {
-    new NeonShooter();
-  }
+  	static function main() {
+    	new NeonShooter();
+  	}
 }
