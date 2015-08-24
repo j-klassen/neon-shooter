@@ -28,6 +28,7 @@ var NeonShooter = function() {
 	this.bricks = new List();
 	this.dt = 0;
 	this.last = 0;
+	this.time = 0;
 	this.canvas = js_Boot.__cast(window.document.getElementById("canvas") , HTMLCanvasElement);
 	this.canvas.style.position = "absolute";
 	this.canvas.style.background = "black";
@@ -62,6 +63,7 @@ var NeonShooter = function() {
 	this.bufferCtx.clearRect(0,0,this.buffer.width,this.buffer.height);
 	this.player = new _$NeonShooter_Player(new _$NeonShooter_Vector2(this.canvas.width / 2,this.canvas.height - 100),new _$NeonShooter_Vector2(400,400),10);
 	this.bricks.add(new _$NeonShooter_Brick(new _$NeonShooter_Vector2(this.canvas.width / 2 - 30,50),new _$NeonShooter_Vector2(0,25),60,30,"blue",10));
+	this.setupListeners();
 	this.tick(0);
 };
 NeonShooter.__name__ = true;
@@ -128,6 +130,44 @@ NeonShooter.prototype = {
 			bullet1.draw(this.ctx);
 		}
 	}
+	,setupListeners: function() {
+		window.addEventListener("keydown",$bind(this,this.onKeyDown),false);
+		window.addEventListener("keyup",$bind(this,this.onKeyUp),false);
+	}
+	,onKeyDown: function(e) {
+		var _g = e.keyCode;
+		switch(_g) {
+		case 37:
+			NeonShooter.controls.left = true;
+			break;
+		case 38:
+			NeonShooter.controls.up = true;
+			break;
+		case 39:
+			NeonShooter.controls.right = true;
+			break;
+		case 40:
+			NeonShooter.controls.down = true;
+			break;
+		}
+	}
+	,onKeyUp: function(e) {
+		var _g = e.keyCode;
+		switch(_g) {
+		case 37:
+			NeonShooter.controls.left = false;
+			break;
+		case 38:
+			NeonShooter.controls.up = false;
+			break;
+		case 39:
+			NeonShooter.controls.right = false;
+			break;
+		case 40:
+			NeonShooter.controls.down = false;
+			break;
+		}
+	}
 	,__class__: NeonShooter
 };
 var _$NeonShooter_Player = function(position,velocity,hp) {
@@ -141,6 +181,10 @@ var _$NeonShooter_Player = function(position,velocity,hp) {
 _$NeonShooter_Player.__name__ = true;
 _$NeonShooter_Player.prototype = {
 	update: function(dt) {
+		if(NeonShooter.controls.left) this.position.x -= this.velocity.x * dt;
+		if(NeonShooter.controls.right) this.position.x += this.velocity.x * dt;
+		if(NeonShooter.controls.up) this.position.y -= this.velocity.y * dt;
+		if(NeonShooter.controls.down) this.position.y += this.velocity.y * dt;
 		this.angle += 2 * dt;
 		this.shotTimer -= dt;
 		if(this.shotTimer <= 0) {
@@ -201,7 +245,17 @@ var _$NeonShooter_Brick = function(position,velocity,width,height,color,hp) {
 };
 _$NeonShooter_Brick.__name__ = true;
 _$NeonShooter_Brick.prototype = {
-	update: function(dt) {
+	right: function() {
+		return this.position.x + this.width;
+	}
+	,bottom: function() {
+		return this.position.y + this.height;
+	}
+	,isOutOfBounds: function(canvas) {
+		if(this.right() <= 0 || this.position.x >= canvas.width || this.bottom() <= 0 || this.position.y >= canvas.height) return true;
+		return false;
+	}
+	,update: function(dt) {
 		this.position.x += this.velocity.x * dt;
 		this.position.y += this.velocity.y * dt;
 	}
@@ -426,6 +480,9 @@ Bool.__ename__ = ["Bool"];
 var Class = { __name__ : ["Class"]};
 var Enum = { };
 NeonShooter.bullets = new List();
+NeonShooter.controls = { left : false, right : false, up : false, down : false};
 js_Boot.__toStr = {}.toString;
 Main.main();
 })(typeof console != "undefined" ? console : {log:function(){}});
+
+//# sourceMappingURL=NeonShooter.js.map

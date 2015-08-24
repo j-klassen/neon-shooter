@@ -4,6 +4,7 @@ import js.Browser;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 import js.html.Image;
+import js.html.KeyboardEvent;
 
 /**
  * ...
@@ -23,6 +24,13 @@ class NeonShooter {
 	var player:Player;
 	var bricks:List<Brick> = new List<Brick>();
 	public static var bullets:List<Bullet> = new List<Bullet>();
+	
+	public static var controls = {
+		left: false,
+		right: false,
+		up: false,
+		down: false
+	};
 
 	public function new() {
 		canvas = cast(Browser.document.getElementById('canvas'), CanvasElement);
@@ -31,7 +39,7 @@ class NeonShooter {
 		canvas.style.border = 'thick solid lightGrey';
 		canvas.style.left = Browser.window.innerWidth / 2 - canvas.width / 2 + 'px';
 		canvas.style.top = Browser.window.innerHeight / 2 - canvas.height / 2 + 'px';
-
+		
 		buffer = Browser.document.createCanvasElement();
 		buffer.width = 50;
 		buffer.height = 50;
@@ -67,7 +75,7 @@ class NeonShooter {
 		squareImg.src = buffer.toDataURL();
 
 		bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
-
+		
 		player = new Player(new Vector2(canvas.width / 2, canvas.height - 100), new Vector2(400, 400), 10);
 		bricks.add(new Brick(
 			new Vector2(canvas.width / 2 - 30, 50),
@@ -76,6 +84,8 @@ class NeonShooter {
 			'blue',
 			10
 		));
+		
+		setupListeners();
 
 		tick(0);
 	}
@@ -111,6 +121,29 @@ class NeonShooter {
 			bullet.draw(ctx);
 		}
 	}
+	
+	function setupListeners():Void {
+		Browser.window.addEventListener('keydown', onKeyDown, false);
+		Browser.window.addEventListener('keyup', onKeyUp, false);
+	}
+	
+	function onKeyDown(e:KeyboardEvent):Void {
+		switch(e.keyCode) {
+			case 37: controls.left = true;
+			case 38: controls.up = true;
+			case 39: controls.right = true;
+			case 40: controls.down = true;
+		}
+	}
+	
+	function onKeyUp(e:KeyboardEvent):Void {
+		switch(e.keyCode) {
+			case 37: controls.left = false;
+			case 38: controls.up = false;
+			case 39: controls.right = false;
+			case 40: controls.down = false;
+		}
+	}
 }
 
 private class Player {
@@ -130,6 +163,19 @@ private class Player {
 	}
 
 	public function update(dt:Float):Void {
+		if (NeonShooter.controls.left) {
+			this.position.x -= this.velocity.x * dt;
+		}
+		if (NeonShooter.controls.right) {
+			this.position.x += this.velocity.x * dt;
+		}
+		if (NeonShooter.controls.up) {
+			this.position.y -= this.velocity.y * dt;
+		}
+		if (NeonShooter.controls.down) {
+			this.position.y += this.velocity.y * dt;
+		}
+		
 		this.angle += 2 * dt;
 
 		shotTimer -= dt;
